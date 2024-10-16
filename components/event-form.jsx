@@ -1,23 +1,39 @@
+"use client";
+
 import { eventSchema } from '@/app/_lib/validators';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { Button } from './ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import useFetch from '@/hooks/useFetch';
+import { createEvent } from '@/actions/events';
+import { useRouter } from 'next/navigation';
 
-const EventForm = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm({
+const EventForm = ({ onSubmitForm }) => {
+    const router = useRouter();
+
+    const { register, handleSubmit, control, formState: { errors } } = useForm({
         resolver: zodResolver(eventSchema),
         defaultValues: {
             duration: 30,
             isPrivate: true,
         }
-    })
+    });
+
+    const { loading, error, func: fnCreateEvent } = useFetch(createEvent);
+
+    const onSubmit = async (data) => {
+        await fnCreateEvent(data);
+        if (!loading && !error) onSubmitForm();
+        router.refresh();
+    };
 
     return (
         <form
             className="px-6 flex flex-col gap-4"
-        // onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmit)}
         >
             <div>
                 <label
@@ -39,7 +55,7 @@ const EventForm = () => {
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-700"
                 >
-                    Description
+                    Event Description
                 </label>
 
                 <Textarea
@@ -106,7 +122,7 @@ const EventForm = () => {
             {errors && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
 
             <Button type="submit" disabled={loading}>
-                {loading ? "Submitting..." : "Create Event"}
+                {loading ? "Submitting" : "Create Event"}
             </Button>
         </form>
     )
