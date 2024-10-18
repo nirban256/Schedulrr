@@ -26,9 +26,9 @@ export async function getUserAvailability() {
 
     const availabilityData = {
         timeGap: user.availability.timeGap
-    }
+    };
 
-    const daysOfWeek = [
+    [
         "monday",
         "tuesday",
         "wednesday",
@@ -36,9 +36,7 @@ export async function getUserAvailability() {
         "friday",
         "saturday",
         "sunday",
-    ];
-
-    daysOfWeek.forEach((day) => {
+    ].forEach((day) => {
         const dayAvailability = user.availability.days.find(
             (d) => d.day === day.toUpperCase()
         );
